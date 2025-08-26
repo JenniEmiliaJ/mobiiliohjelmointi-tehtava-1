@@ -1,24 +1,41 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from 'react-native';
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TextInput, View, FlatList } from 'react-native';
 
 export default function App() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   const [sum, setSum] = useState(null);
+  const [historia, setHistoria] = useState('');
+  const [historiat, setHistoriat] = useState([]);
+
+  const initialFocus = useRef(null);
 
   function calculateplus() {
     const numA = parseFloat(a) || 0;
     const numB = parseFloat(b) || 0;
-    setSum(numA + numB);
+    const result = numA + numB;
+    setSum(result);
+    const entry = `${numA} + ${numB} = ${result}`;
+    setHistoriat([...historiat, entry]);
+    setA('');
+    setB('');
+  initialFocus.current.focus();
   }
 
   function calculateminus() {
     const numA = parseFloat(a) || 0;
     const numB = parseFloat(b) || 0;
-    setSum(numA - numB);
+    const result = numA - numB;
+    setSum(result);
+    const entry = `${numA} - ${numB} = ${result}`;
+    setHistoriat([...historiat, entry]);
+    setA('');
+    setB('');
+  initialFocus.current.focus();
   }
+  
  
   return (
     <SafeAreaView style={styles.container}>
@@ -26,7 +43,7 @@ export default function App() {
     {sum !== null && <Text style={styles.result}>Result: {sum}</Text>}
 
       <TextInput
-      style={styles.input}
+      style={styles.input} ref={initialFocus}
       placeholder="Luku 1"
       keyboardType="numeric"
       value={a}
@@ -41,10 +58,19 @@ export default function App() {
       onChangeText={setB}
       />
 
+    
       <View style={styles.buttonRow}>
       <Button title="+" onPress={calculateplus} />
       <Button title="-" onPress={calculateminus} />
       </View>
+
+      <Text style={styles.result}>History</Text>
+     <FlatList
+        data={historiat}
+        renderItem={
+          ({item}) => <Text style={styles.listItem}>{item}</Text> 
+        }
+      />
 
     </SafeAreaView>
   );
@@ -58,6 +84,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
     gap: 12 },
+
+  listItem: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    fontSize: 15,
+    marginTop: 2
+  },
 
   input: {
       width: "80%",
